@@ -75,7 +75,9 @@ pipeline {
                 }
             }
             steps {
-                sh script: "ssh -o StrictHostKeyChecking=no root@vpn4jenkins.modernisc.com ansible-playbook /home/develop/workspace/boms/boms.yml", label: "running playbook .."
+                sh script: "ssh -o StrictHostKeyChecking=no root@172.16.16.1 kubectl apply -f deployment.yml", label: "running deployment .."
+                sh script: "ssh -o StrictHostKeyChecking=no root@172.16.16.1 kubectl apply -f service.yml", label: "running deployment .."
+                sh script: "ssh -o StrictHostKeyChecking=no root@172.16.16.1 kubectl apply -f ingress.yml", label: "running deployment .."
             }
         }
     }
