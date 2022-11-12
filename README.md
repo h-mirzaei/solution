@@ -14,7 +14,7 @@ Setup multi master k8s cluster using haproxy as load balancer and calico as k8s 
         6- after setting up the cluster you should run kubernetes-setup/kubeallconfig-playbook.yml which install the ingress and helm
         7- I used Nginx ingress to serve the deployed application. 
         8- I also wrote deployment for a pre built application which you can find deployment files in kubernetes-setup/ingress
-        9- I have writen deployment for sample helloworld maven which is placed in kubernetes-setup\sample-helloworld
+        9- I have writen deployment for sample helloworld maven which is placed in kubernetes-setup\sample-helloworld. This deployment has the ability to rolling                  update and rollback
 
 ###################################################################################################
 
