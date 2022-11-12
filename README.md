@@ -44,4 +44,4 @@ CI/CD Pipeline (helloworld)
         5- I have writen deployment for sample helloworld maven which is placed in kubernetes-setup\sample-helloworld
 
 
-Also With this solution which is a multi-master cluster we can optain a fully HA production setup. In case of in one of our masters the cluster will still work.
+Also With this solution which is a multi-master cluster we can optain a fully HA production setup. In case of disaster in one of our masters the cluster will still work.
