@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: helloWorld-deploy
+ labels:
+        app: HelloWorld
+        type: HelloWorld
+spec:
+ template:
+    metadata:
+       name: HelloWorld-pod
+       labels:
+           app: HelloWorld
+           type: HelloWorld
+    spec:
+        containers:
+        - name: nasim-core
+          imagePullPolicy: IfNotPresent
+          image: abis-snapshot:v1.0
+          ports:
+             - containerPort: 9292
+             - containerPort: 9393
+ replicas: 3
+ strategy:
+        type: RollingUpdate
+        rollingUpdate:
+                maxSurge: 2
+                maxUnavailable: 2
+ selector:
+   matchLabels:
+        type: core-nasim

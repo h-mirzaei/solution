@@ -24,14 +24,6 @@
   - name: apply calico
     command: kubectl apply -f calico.yaml
 
-  # - name: setup galera cluster
-  #   command: "{{ item }}"
-  #   with_items:
-  #    - kubectl create -f galera/etcd-cluster.yaml
-  #    - kubectl create -f galera/mariadb-pv.yaml
-  #    - kubectl create -f galera/mariadb-pvc.yaml
-  #    - kubectl create -f galera/mariadb-ss.yaml
-
   - name: setup helm
     shell: "{{ item }}"
     with_items:
@@ -39,29 +31,6 @@
      - chmod +x get_helm.sh
      - ./get_helm.sh
      - helm repo add stable https://charts.helm.sh/stabl
-
-  # - name: setup rook ceph
-  #   command: "{{ item }}"
-  #   with_items:
-  #    - kubectl create -f rook-ceph/crds.yaml -f rook-ceph/common.yaml -f rook-ceph/operator.yaml
-  #    - kubectl create -f rook-ceph/cluster.yaml
-  #    - kubectl create -f rook-ceph/toolbox.yaml
-  
-  # - name: setup prometheus
-  #   command: "{{ item }}"
-  #   with_items:
-  #    - kubectl create namespace monitoring
-  #    - kubectl create -f prometheus/clusterRole.yaml
-  #    - kubectl create -f prometheus/config-map.yaml
-  #    - kubectl create -f prometheus/prometheus-deployment.yaml 
-  #    - kubectl create -f prometheus/prometheus-service.yaml --namespace=monitoring
-
-  # - name: setup prometheus alert manager and grafana
-  #   command: "{{ item }}"
-  #   with_items:
-  #    - git clone https://github.com/prometheus-operator/kube-prometheus.git
-  #    - kubectl create -f kube-prometheus/manifests/setup
-  #    - kubectl create -f kube-prometheus/manifests/
 
   - name: nginx-ingress controller
     command: "{{ item }}"

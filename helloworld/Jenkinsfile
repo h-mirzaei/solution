@@ -1,0 +1,123 @@
+/*
+ * @Created: 
+ * @Date : 2022.
+ * @author : hamid.mirzaeee1376@gmail.com
+ *
+ *    /\_/\
+ *  =( °w° )=       Meow
+ *    )   (  //
+ *   (__ __)//
+ */
+
+package HelloWorld
+
+def jobName = currentBuild.fullDisplayName
+
+pipeline {
+    agent any
+    parameters {
+        choice(name: 'JDKs', choices: ['jdk1.8.0_172', 'jdk1.8.0_152', 'adopt-jdk-11.0.9', 'jdk-12.0.2', 'jdk-17.0.2'], description: 'Choose jdk for this project')
+        booleanParam(name: 'executeTests', defaultValue: false, description: 'Skip maven test')
+        booleanParam(name: 'DeploytoK8sCluster', defaultValue: true, description: 'Deploy to server')
+    }
+    options {
+        copyArtifactPermission('*');
+    }
+    environment {
+         def version2 = "initial"
+    }
+    stages {
+
+        stage("Initialization") {
+            steps {
+                script {
+                      try {
+                          version = readMavenPom().getVersion()
+                      } catch (Exception e) {
+                          version= "initial"
+                      }
+                }
+                // use name of the patchset as the build name
+                buildName "#${BUILD_NUMBER} - Artifact: ver ${version}"
+            }
+        }
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: '...'
+            }
+        }
+        stage('Build Helloworld') {
+            tools {
+                jdk "${params.JDKs}"
+            }
+            steps {
+                sh script: 'java -version', label: "Java version"
+                sh script: 'mvn -v', label: "Maven version"
+                script {
+                    if (params.executeTests) {
+                        // Run Maven on a Unix agent.,
+                        withMaven(mavenOpts: '-Djansi.force=true') {
+                            sh script: "mvn clean install -q --no-transfer-progress -Dstyle.color=always -T5", label: "Building HelloWorld please wait ..."
+                        }
+                    } else {
+                        // Run Maven on a Unix agent.,
+                        withMaven(mavenOpts: '-Djansi.force=true') {
+                            sh script: "mvn clean install -q --no-transfer-progress -DskipTests -Dstyle.color=always -T5", label: "Building HelloWorld please wait ..."
+                        }
+                    }
+                }
+            }
+        }	
+        stage('DeploytoK8sCluster') {
+            when {
+                expression {
+                    params.executeDeploytoK8sCluster
+                }
+            }
+            steps {
+                sh script: 'scp -o StrictHostKeyChecking=no ${WORKSPACE}/boms/boms-app/target/*.jar root@vpn4jenkins.modernisc.com:/home/develop/workspace/boms/boms/', label: "Copy artifact to remote server"
+				sh script: 'scp -o StrictHostKeyChecking=no ${WORKSPACE}/boms/boms-app/src/main/resources/config/application.properties root@vpn4jenkins.modernisc.com:/home/develop/workspace/boms', label: "Copy artifact to remote server"
+                sh script: "ssh -o StrictHostKeyChecking=no root@vpn4jenkins.modernisc.com ansible-playbook /home/develop/workspace/boms/boms.yml", label: "running playbook .."
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+pipeline{
+    agent any
+
+    tools {
+         maven 'maven'
+         jdk 'java'
+    }
+
+    stages{
+        stage('checkout'){
+            steps{
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github access', url: 'https://github.com/sreenivas449/java-hello-world-with-maven.git']]])
+            }
+        }
+        stage('build'){
+            steps{
+               bat 'mvn package'
+            }
+        }
+    }
+}
