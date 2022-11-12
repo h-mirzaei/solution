@@ -1,0 +1,21 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.ssh.insert_key = false
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 4096
+    v.cpus = 2
+  end
+  config.vm.define "jenkins" do |jenkins|
+      jenkins.vm.box = "bento/ubuntu-16.04"
+      jenkins.vm.network "private_network", ip: "172.16.16.53"
+      jenkins.vm.hostname = "jenkins"
+      jenkins.vm.provision "ansible_local" do |ansible|
+            ansible.playbook = "./test.yml"
+            ansible.extra_vars = {
+                 node_ip: "172.16.16.53",
+             }
+      end
+  end
+end

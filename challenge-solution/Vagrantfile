@@ -1,0 +1,78 @@
+IMAGE_NAME = "bento/ubuntu-16.04"
+N = 2
+
+Vagrant.configure("2") do |config|
+    config.ssh.insert_key = false
+
+    config.vm.provider "virtualbox" do |v|
+        v.memory = 4096
+        v.cpus = 2
+    end
+
+
+     config.vm.define "loadbalancer" do |ha|
+         ha.vm.box = IMAGE_NAME
+         ha.vm.network "private_network", ip: "172.16.16.1"
+         ha.vm.hostname = "loadbalancer"
+         ha.vm.network :forwarded_port, host: 8080, guest: 80
+         ha.vm.network :forwarded_port, host: 6443, guest: 6443
+         ha.vm.provision "ansible_local" do |ansible|
+             ansible.playbook = "kubernetes-setup/haproxy-playbook.yml"
+             ansible.extra_vars = {
+                 node_ip: "172.16.16.1",
+             }
+         end
+     end
+
+
+    config.vm.define "master1" do |master0|
+        master0.vm.box = IMAGE_NAME
+        master0.vm.network "private_network", ip: "172.16.16.10"
+        master0.vm.hostname = "master1"
+        master0.vm.disk :disk, size: "3GB", name: "extra_storage0"
+        master0.vm.disk :disk, size: "3GB", name: "extra_storage1"
+
+        master0.vm.provision "ansible_local" do |ansible|
+            ansible.playbook = "kubernetes-setup/master-playbook0.yml"
+            ansible.extra_vars = {
+                node_ip: "172.16.16.10",
+            }
+        end
+    end
+     config.vm.define "master2" do |master1|
+        master1.vm.box = IMAGE_NAME
+        master1.vm.network "private_network", ip: "172.16.16.20"
+        master1.vm.hostname = "master2"
+        master1.vm.network :forwarded_port, host: 30000, guest: 30000
+        master1.vm.network :forwarded_port, host: 32000, guest: 32000
+        master1.vm.network :forwarded_port, host: 32500, guest: 32500
+        master1.vm.network :forwarded_port, host: 32075, guest: 32075
+        master1.vm.network :forwarded_port, host: 31407, guest: 31407
+        master1.vm.disk :disk, size: "3GB", name: "extra_storage0"
+        master1.vm.disk :disk, size: "3GB", name: "extra_storage1"
+        master1.vm.provision "ansible_local" do |ansible|
+            ansible.playbook = "kubernetes-setup/master-playbook1.yml"
+            ansible.extra_vars = {
+                node_ip: "172.16.16.20",
+             }
+        end
+     end
+
+
+
+    (1..N).each do |i|
+        config.vm.define "node#{i}" do |node|
+            node.vm.box = IMAGE_NAME
+            node.vm.network "private_network", ip: "172.16.16.#{i + 10}"
+            node.vm.disk :disk, size: "3GB", name: "extradisk0"
+            node.vm.disk :disk, size: "3GB", name: "extradisk1"
+            node.vm.hostname = "workernode-#{i}"
+            node.vm.provision "ansible_local" do |ansible|
+                ansible.playbook = "kubernetes-setup/node-playbook.yml"
+                ansible.extra_vars = {
+                    node_ip: "172.16.16.#{i + 10}",
+                }
+            end
+        end
+    end
+end
