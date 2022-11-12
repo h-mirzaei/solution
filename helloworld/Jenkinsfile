@@ -75,8 +75,6 @@ pipeline {
                 }
             }
             steps {
-                sh script: 'scp -o StrictHostKeyChecking=no ${WORKSPACE}/boms/boms-app/target/*.jar root@vpn4jenkins.modernisc.com:/home/develop/workspace/boms/boms/', label: "Copy artifact to remote server"
-				sh script: 'scp -o StrictHostKeyChecking=no ${WORKSPACE}/boms/boms-app/src/main/resources/config/application.properties root@vpn4jenkins.modernisc.com:/home/develop/workspace/boms', label: "Copy artifact to remote server"
                 sh script: "ssh -o StrictHostKeyChecking=no root@vpn4jenkins.modernisc.com ansible-playbook /home/develop/workspace/boms/boms.yml", label: "running playbook .."
             }
         }
