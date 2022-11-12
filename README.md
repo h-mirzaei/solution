@@ -1,5 +1,6 @@
 ###
 Setup multi master k8s cluster using haproxy as load balancer and calico as k8s network (challenge-solution)
+
     note: solution has been tested on ubuntu and windows
           solution just require vagrant and vbox
           solution use ansible(local_ansible) as provisioner which obtain automation 
@@ -18,6 +19,7 @@ Setup multi master k8s cluster using haproxy as load balancer and calico as k8s 
 ###################################################################################################
 
 Setup jenkins as our CI/CD tool via Vagrantfile (jenkins)
+
     note: solution has been tested on ubuntu and windows
           solution just require vagrant and vbox
           solution use ansible(local_ansible) as provisioner which obtain automation
@@ -31,6 +33,7 @@ Setup jenkins as our CI/CD tool via Vagrantfile (jenkins)
 ###################################################################################################
 
 CI/CD Pipeline (helloworld)
+
     note: I have used Jenkins to create CI/CD pipeline which builds the code and deploys the project to K8s cluster. I must mention that I have used a public github HelloWorld project as my sample maven project.
 
     todo:
